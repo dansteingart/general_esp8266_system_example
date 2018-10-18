@@ -2,22 +2,38 @@ import urequests as req
 import json
 import urandom
 import time
-site="https://data.dansteingart.com/input/"
+sets = json.load(open("network.json"))
+
+site = sets['site']
+db   = sets['db']
+col  = sets['node']
+
+#Designed for the MakerFocus with Screen
 SDA = 4
 SCL = 5
 RST = 16
-import machine
+
+from machine import I2C,Pin
 import ssd1306
 import dht
 
-i2c = machine.I2C(-1, machine.Pin(5), machine.Pin(4))
+pm= {}
+pm['3'] = 0
+pm['8'] = 15
+pm['7'] = 13
+pm['6'] = 12
+pm['SCL'] = 14
+
+
+i2c = I2C(-1, Pin(5), Pin(4))
 oled = ssd1306.SSD1306_I2C(128, 32, i2c)
-#Turn Power On
-power = machine.Pin(13,machine.Pin.OUT)
-power.on()
 
 #Enable DHT22
-d = dht.DHT22(machine.Pin(15,machine.Pin.IN,machine.Pin.PULL_UP))
+power = Pin(12,Pin.OUT)
+power.on()
+
+#Pin that pin
+d = dht.DHT22(Pin(0,Pin.IN,Pin.PULL_UP))
 
 sent = "Starting The Thing!"
 
@@ -47,7 +63,7 @@ def sample(dd):
     return data
 
 def send(o):
-    out = {'db':'lab_data','col':'ACEE214'}
+    out = {'db':db,'col':col}
     out['data']=o
     try:
         out = req.post(site,data=json.dumps(out)).json()
@@ -73,5 +89,4 @@ while True:
             send(data)
     except Exception as E:
         print(str(E))
-
     time.sleep(1)

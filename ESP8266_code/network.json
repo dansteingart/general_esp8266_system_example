@@ -1,0 +1,7 @@
+{
+  "ssid": "ssid",
+  "pass": "pass",
+  "site": "https://where.your.data/goes",
+  "db"  : "dbname",
+  "name": "node name"
+}
